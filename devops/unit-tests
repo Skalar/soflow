@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tape 'lib/**/*.test.js' | tap-spec

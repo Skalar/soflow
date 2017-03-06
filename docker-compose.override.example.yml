@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  dev:
+    environment:
+      AWS_ACCESS_KEY_ID: changeme
+      AWS_SECRET_ACCESS_KEY: changeme
+      AWS_DEFAULT_REGION: eu-west-1

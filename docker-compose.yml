@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  dev:
+    build: .
+    working_dir: /soflow/compiled
+    tty: true
+    volumes:
+      - .:/soflow/src
+      - /soflow/compiled
+    environment:
+      SWF_DOMAIN: SoFlow
+      SOFLOW_NAMESPACE: soflow-testing
+      SOFLOW_VERSION: integration_tests
+    command: devops/start-dev
