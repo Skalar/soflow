@@ -13,7 +13,7 @@ const {
 const switches = process.argv.slice(2)
 
 if (!switches.includes('--no-setup')) {
-  test('Setting up Cloudformation stack... (takes 2-3 min)', async t => {
+  test('⚙  Setting up CloudFormation stack... (takes 2-3 min)', async t => {
     await SWF.deploy({
       namespace,
       domain,
@@ -32,7 +32,7 @@ if (!switches.includes('--no-setup')) {
   })
 }
 
-test('Invoking SWF decider lambda function', async t => {
+test('⚙  Invoking SWF decider lambda function', async t => {
   await lambda.invoke({
     FunctionName: `${namespace}_decider`,
     InvocationType: 'Event',
@@ -51,7 +51,7 @@ catch (error) {
 }
 
 if (!switches.includes('--no-teardown')) {
-  test('Teardown (takes 2-3 min)', async t => {
+  test('⚙  Deleting CloudFormation stack... (takes 2-3 min)', async t => {
     await SWF.teardown({namespace})
     t.pass('done')
   })
