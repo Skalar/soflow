@@ -6,11 +6,11 @@ const {
   SOFLOW_NAMESPACE: namespace,
 } = process.env
 
-test('SoFlow.SWF / Basic workflow', async t => {
+test('SWF: SimpleMath', async t => {
   const result = await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'soflow-integration-tests',
+    id: 'SimpleMath',
     type: 'SimpleMath',
     version: 'integration_tests',
     input: 2.5,
