@@ -12,55 +12,47 @@ const {
 
 const switches = process.argv.slice(2)
 
+if (!switches.includes('--no-setup')) {
+  test('Setting up Cloudformation stack... (takes 2-3 min)', async t => {
+    await SWF.deploy({
+      namespace,
+      domain,
+      version,
+      workflowsPath: 'integration-tests/workflows',
+      tasksPath: 'integration-tests/tasks',
+      files: [
+        'node_modules/**',
+        'lib/**',
+        'integration-tests/**',
+        'package.json',
+      ]
+    })
 
-test('Setup (takes a while)', async t => {
-  if (!switches.includes('--no-setup')) {
-    await setup()
-    t.pass('create CloudFormation stack')
-  } else {
-    t.pass('skipping CloudFormation stack creation')
-  }
+    t.pass('done')
+  })
+}
 
+test('Invoking SWF decider lambda function', async t => {
   await lambda.invoke({
     FunctionName: `${namespace}_decider`,
     InvocationType: 'Event',
   }).promise()
 
-  t.pass('invoke decider')
+  t.pass('done')
 })
 
 try {
-  require('./SWF/basic-workflow.test')
+  require('./workflows/SimpleMath.swf.test')
+  require('./workflows/DeciderException.swf.test')
+  require('./workflows/LambdaFailure.swf.test')
 }
 catch (error) {
   console.log('error', error)
 }
 
-test('Teardown (takes a while)', async t => {
-  if (!switches.includes('--no-teardown')) {
-    await teardown()
-    t.pass('delete CloudFormation stack')
-  } else {
-    t.pass('skip CloudFormation stack deletion')
-  }
-})
-
-function setup() {
-  return SWF.deploy({
-    namespace,
-    domain,
-    version,
-    workflowsPath: 'integration-tests/TestProject/workflows',
-    tasksPath: 'integration-tests/TestProject/tasks',
-    files: [
-      'node_modules/**',
-      'lib/**',
-      'integration-tests/**',
-      'package.json',
-    ]
+if (!switches.includes('--no-teardown')) {
+  test('Teardown (takes 2-3 min)', async t => {
+    await SWF.teardown({namespace})
+    t.pass('done')
   })
-}
-
-function teardown() {
-  return SWF.teardown({namespace})
 }

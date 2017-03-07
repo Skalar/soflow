@@ -1,1 +1,0 @@
-export SimpleMath from './SimpleMath'
