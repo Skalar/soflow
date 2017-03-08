@@ -1,5 +1,5 @@
 {
-  "name": "soflow",
+  "name": "@skalar/soflow",
   "version": "0.0.1",
   "description": "Run local and swf workflows",
   "main": "lib/index.js",
