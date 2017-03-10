@@ -8,7 +8,7 @@ An attempt at making AWS SWF usage practical.
 ### Install package
 
 ```shell
-yarn add soflow # or npm install --save soflow
+yarn add @skalar/soflow
 ```
 
 ### Define tasks

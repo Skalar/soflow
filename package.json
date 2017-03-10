@@ -1,6 +1,6 @@
 {
   "name": "@skalar/soflow",
-  "version": "0.0.1",
+  "version": "0.0.6",
   "description": "Run local and swf workflows",
   "main": "lib/index.js",
   "author": "Trym Skaar <trym.skaar@gmail.com>",
@@ -30,6 +30,7 @@
     "aws-sdk": "^2.23.0",
     "axios": "^0.15.3",
     "debug": "^2.6.1",
-    "glob": "^7.1.1"
+    "glob": "^7.1.1",
+    "lodash": "^4.17.4"
   }
 }
