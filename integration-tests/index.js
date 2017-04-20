@@ -47,6 +47,7 @@ try {
   require('./workflows/SimpleMath.swf.test')
   require('./workflows/DeciderException.swf.test')
   require('./workflows/LambdaFailure.swf.test')
+  require('./workflows/ReceiveSignal.swf.test')
 }
 catch (error) {
   console.log('error', error)
