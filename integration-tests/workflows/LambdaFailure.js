@@ -1,6 +1,8 @@
-async function LambdaFailure({lambdaFunctions}) {
-  const {failTask} = lambdaFunctions
-
+async function LambdaFailure({
+  tasks: {
+    failTask,
+  }
+}) {
   await failTask()
 }
 
