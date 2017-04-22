@@ -25,7 +25,8 @@ if (!switches.includes('--no-setup')) {
         'lib/**',
         'integration-tests/**',
         'package.json',
-      ]
+      ],
+      soflowRoot: '.'
     })
 
     t.pass('done')
