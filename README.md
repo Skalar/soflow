@@ -48,18 +48,18 @@ export CreateOrder from './CreateOrder'
 
 __workflows/CreateOrder.js__
 ```javascript
-export async function CreateOrder({input, actions, lambdaFunctions}) {
-  const {
-    addOrderToDatabase,
-    sendOrderConfirmation,
-  } = lambdaFunctions
-
-  const {
+export async function CreateOrder({
+  input: {
     confirmationEmailRecipient,
     products,
     customerId,
-  } = input
-
+  },
+  actions,
+  tasks: {
+    addOrderToDatabase,
+    sendOrderConfirmation,
+  }
+}) {
   const orderData = await addOrderToDatabase(customerId, products)
   await sendOrderConfirmation(orderData)
 

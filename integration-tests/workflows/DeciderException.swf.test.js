@@ -15,6 +15,9 @@ test('SWF: DeciderException', async t => {
     id: 'DeciderException',
     type: 'DeciderException',
     version: 'integration_tests',
+    taskTypes: {
+      default: 'lambda'
+    }
   }).catch(error => {
     t.pass('rejects promise')
     t.equal(error.name, 'Error', 'forwards the error name')

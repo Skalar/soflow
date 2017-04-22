@@ -1,6 +1,9 @@
-async function SimpleMath({input, lambdaFunctions}) {
-  const {doubleNumber} = lambdaFunctions
-
+async function SimpleMath({
+  input,
+  tasks: {
+    doubleNumber
+  }
+}) {
   const doubledNumber = await doubleNumber(input)
   const twiceDoubledNumber = await doubleNumber(doubledNumber)
 
