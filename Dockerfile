@@ -27,7 +27,7 @@ COPY package.json yarn.lock ./
 RUN \
   yarn install \
   && ln -s /$packageName/node_modules $SRC_DIR/node_modules \
-  && ln -s /$packageName/node_modules $COMPILED_DIR/node_modules
+  && cp -R /$packageName/node_modules $COMPILED_DIR/
 
 WORKDIR $COMPILED_DIR
 

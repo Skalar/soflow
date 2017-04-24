@@ -1,6 +1,6 @@
 {
-  "name": "@skalar/soflow",
-  "version": "0.0.7",
+  "name": "soflow",
+  "version": "0.0.1",
   "description": "Run local and swf workflows",
   "main": "lib/index.js",
   "author": "Trym Skaar <trym.skaar@gmail.com>",

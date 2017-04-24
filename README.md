@@ -7,8 +7,11 @@ An attempt at making AWS SWF usage practical.
 
 ### Install package
 
+
 ```shell
-yarn add @skalar/soflow
+# Temporary method for now
+docker-compose up --build
+docker cp soflow_dev_1:/soflow/compiled ~/Projects/myproject/node_modules/soflow
 ```
 
 ### Define tasks
