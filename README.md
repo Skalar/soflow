@@ -27,6 +27,14 @@ async function addOrderToDatabase(data) {
   return result
 }
 
+addOrderToDatabase.config = {
+  SWF: {
+    lambda: {
+      memorySize: 128,
+      timeout: 60,
+    }
+  }
+}
 export default addOrderToDatabase
 ```
 
@@ -48,7 +56,7 @@ export CreateOrder from './CreateOrder'
 
 __workflows/CreateOrder.js__
 ```javascript
-export async function CreateOrder({
+async function CreateOrder({
   input: {
     confirmationEmailRecipient,
     products,
@@ -65,6 +73,17 @@ export async function CreateOrder({
 
   return orderData
 }
+
+CreateOrder.config = {
+  SWF: {
+    tasks: {
+      addOrderToDatabase: {type: 'lambda'}, // default
+      sendOrderConfirmation: {type: 'activityTask'}
+    }
+  }
+}
+
+export default CreateOrder
 ```
 
 ### Deploy
@@ -82,7 +101,8 @@ SWF.deploy({
     'node_modules/**',
     'workflows/**',
     'tasks/**',
-  ]
+  ],
+  runDeciderImmediately: false, // default
 })
 ```
 
