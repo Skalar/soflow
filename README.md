@@ -10,8 +10,7 @@ An attempt at making AWS SWF usage practical.
 
 ```shell
 # Temporary method for now
-docker-compose up --build
-docker cp soflow_dev_1:/soflow/compiled ~/Projects/myproject/node_modules/soflow
+yarn add https://soflow-package.s3.amazonaws.com/soflow-latest.tgz
 ```
 
 ### Define tasks
