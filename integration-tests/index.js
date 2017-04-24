@@ -26,7 +26,8 @@ if (!switches.includes('--no-setup')) {
         'integration-tests/**',
         'package.json',
       ],
-      soflowRoot: '.'
+      soflowRoot: '.',
+      includeDeciderSpawnerSchedule: false,
     })
 
     t.pass('done')
