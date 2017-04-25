@@ -10,6 +10,6 @@ services:
       - /soflow/compiled
     environment:
       SWF_DOMAIN: SoFlow
-      SOFLOW_NAMESPACE: soflow-testing
+      SOFLOW_NAMESPACE: $USER-soflow-testing
       SOFLOW_VERSION: integration_tests
     command: devops/start-dev
