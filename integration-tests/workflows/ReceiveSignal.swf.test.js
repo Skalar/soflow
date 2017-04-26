@@ -9,6 +9,25 @@ const {
   SOFLOW_NAMESPACE: namespace,
 } = process.env
 
+function sendSignal(workflowId, input) {
+  const params = {
+    domain,
+    signalName: 'receiveSignalTest',
+    workflowId,
+    input: JSON.stringify(input),
+  }
+
+  return new Promise((resolve, reject) => {
+    swf.signalWorkflowExecution(params, function(err) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve()
+      }
+    })
+  })
+}
+
 test('SWF: ReceiveSignal', async t => {
   t.plan(1)
 
@@ -28,20 +47,45 @@ test('SWF: ReceiveSignal', async t => {
     t.deepEqual(result, testData, 'completes with the correct result')
   })
 
-  const params = {
-    domain,
-    signalName: 'receiveSignalTest',
-    workflowId,
-    input: JSON.stringify(testData),
-  }
   setTimeout(() => {
     // We use a timeout to give SWF time to start the workflow before sending a signal
-    swf.signalWorkflowExecution(params, function(err) {
-      if (err) {
-        console.log(err, err.stack)
+    sendSignal(workflowId, testData)
+      .catch(err => {
         t.fail(err.msg)
-      }
-    })
+      })
+  }, 1000)
+
+  return promise
+})
+
+test('SWF: ReceiveSignal multiple times with the same signal name', async t => {
+  t.plan(1)
+
+  const testData = [10, 'foo']
+  const workflowId = 'ReceiveSignalMultipleTimes'
+
+  const promise = SWF.executeWorkflow({
+    domain,
+    namespace,
+    id: workflowId,
+    type: 'ReceiveSignalMultipleTimes',
+    version: 'integration_tests',
+    executionStartToCloseTimeout: 300,
+    input: null,
+  })
+  .then(result => {
+    t.deepEqual(result, testData, 'completes with the correct result')
+  })
+
+  setTimeout(() => {
+    // We use a timeout to give SWF time to start the workflow before sending a signal
+    sendSignal(workflowId, testData[0])
+      .then(() => {
+        return sendSignal(workflowId, testData[1])
+      })
+      .catch(err => {
+        t.fail(err.msg)
+      })
   }, 1000)
 
   return promise
