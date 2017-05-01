@@ -1,8 +1,5 @@
 import {SWF} from '~/lib'
 import test from 'blue-tape'
-import AWS from 'aws-sdk'
-
-const lambda = new AWS.Lambda({region: 'eu-west-1'})
 
 const {
   SWF_DOMAIN: domain,
@@ -13,8 +10,8 @@ const {
 const switches = process.argv.slice(2)
 
 if (!switches.includes('--no-setup')) {
-  test('⚙  Setting up CloudFormation stack... (takes 2-3 min)', async t => {
-    await SWF.deploy({
+  test('⚙  SWF Deployment', async t => {
+    await SWF.DevOps.deployWithSpinner({
       namespace,
       domain,
       version,
@@ -27,20 +24,21 @@ if (!switches.includes('--no-setup')) {
         'package.json',
       ],
       soflowRoot: '.',
-      includeDeciderSpawnerSchedule: false,
+      createBucket: true,
+      enableDeciderSchedule: false,
     })
-
-    t.pass('done')
+    t.comment('Giving AWS some time to get up and running...')
+    await new Promise(resolve => setTimeout(resolve, 10000))
   })
 }
 
 test('⚙  Invoking SWF decider lambda function', async t => {
-  await lambda.invoke({
-    FunctionName: `${namespace}_decider`,
-    InvocationType: 'Event',
-  }).promise()
+  await SWF.DevOps.invokeDecider({
+    namespace,
+    version,
+  })
 
-  t.pass('done')
+  t.pass(`Invoked decider for ${namespace}@${version}`)
 })
 
 try {
@@ -54,8 +52,10 @@ catch (error) {
 }
 
 if (!switches.includes('--no-teardown')) {
-  test('⚙  Deleting CloudFormation stack... (takes 2-3 min)', async t => {
-    await SWF.teardown({namespace})
-    t.pass('done')
+  test('⚙  SWF teardown', async () => {
+    await SWF.DevOps.teardownWithSpinner({
+      namespace,
+      domain,
+    })
   })
 }
