@@ -13,6 +13,7 @@ test('SWF: WithoutReturn', {timeout: 2000}, async t => {
     id: 'SimpleMath',
     type: 'SimpleMath',
     version: 'integration_tests',
+    executionStartToCloseTimeout: 5,
     input: 2.5,
   })
 

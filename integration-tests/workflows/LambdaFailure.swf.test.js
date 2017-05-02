@@ -15,6 +15,7 @@ test('SWF: LambdaFailure', async t => {
     id: 'LambdaFailure',
     type: 'LambdaFailure',
     version: 'integration_tests',
+    executionStartToCloseTimeout: 5,
   }).catch(error => {
     t.pass('rejects promise')
     t.equal(error.name, 'Error', 'uses the correct error name')

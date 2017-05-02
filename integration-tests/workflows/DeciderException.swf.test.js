@@ -15,6 +15,7 @@ test('SWF: DeciderException', async t => {
     id: 'DeciderException',
     type: 'DeciderException',
     version: 'integration_tests',
+    executionStartToCloseTimeout: 5,
   }).catch(error => {
     t.pass('rejects promise')
     t.equal(error.name, 'Error', 'forwards the error name')

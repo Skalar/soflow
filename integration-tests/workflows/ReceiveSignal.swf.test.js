@@ -40,7 +40,7 @@ test('SWF: ReceiveSignal', async t => {
     id: workflowId,
     type: 'ReceiveSignal',
     version: 'integration_tests',
-    executionStartToCloseTimeout: 300,
+    executionStartToCloseTimeout: 5,
     input: null,
   })
   .then(result => {
@@ -70,7 +70,7 @@ test('SWF: ReceiveSignal multiple times with the same signal name', async t => {
     id: workflowId,
     type: 'ReceiveSignalMultipleTimes',
     version: 'integration_tests',
-    executionStartToCloseTimeout: 300,
+    executionStartToCloseTimeout: 5,
     input: null,
   })
   .then(result => {
