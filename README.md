@@ -88,23 +88,121 @@ CreateOrder.config = {
 export default CreateOrder
 ```
 
-### Deploy
+
+
+### Deployment
+
 ```javascript
 import {SWF} from 'soflow'
 
-SWF.deploy({
+const deployPromise = SWF.DevOps.deploy({
+  // Prefix for all created resources
+  // WARNING: be sure namespace is unique, teardown removes
+  // everything it finds within it.
   namespace: 'myapp-production',
-  domain: 'myapp',
+
+  // Name of SWF domain
+  // Default: namespace
+  domain: 'MyDomain',
+
+  // Description of SWF domain (if one is to be created)
+  domainDescription: 'Very nice domain',
+
+  // Version name for the deployment
   version: 'v1',
-  workflowsPath: 'workflows', // default
-  tasksPath: 'tasks',         // default
+
+  // Root of the code to deploy.
+  // Default: process.cwd()
+  codeRoot: '/my/code/is/here',
+
+  // Whether to continously run decider via scheduled events
+  // Default: true
+  enableDeciderSchedule: true,
+
+  // Path to your exported workflows, relative to codeRoot
+  // Default: 'workflows'
+  workflowsPath: 'workflows',
+
+  // Path to your exported tasks, relative to codeRoot
+  // Default: 'tasks'
+  tasksPath: 'tasks',
+
+  // File patterns of what to include in the lambda package.
+  // Everything needed by your tasks must be included (including the soflow npm module).
+  // Default: ['**']
   files: [
     'package.json',
     'node_modules/**',
     'workflows/**',
     'tasks/**',
   ],
-  runDeciderImmediately: false, // default
+
+  // File patterns of what to ignore when building the lambda package
+  // Default: ['.git/**']
+  ignore: [
+    '.git/**',
+  ]
+
+  // Name of s3 bucket to use as an intermediary for lambda code packages
+  // Default: namespace
+  s3Bucket: 'mybucket',
+
+  // Prefix for files in the s3 bucket
+  // Default: 'soflow/'
+  s3Prefix: 'temporary-files/',
+
+  // Whether or not to create s3 bucket
+  // Default: true
+  createBucket: false,
+
+  // Location of the soflow module, relative to the codeRoot
+  // Default: 'node_modules/soflow'
+  soflowRoot: '/shared/node_modules/soflow',
+
+  // How long to keep workflow history.
+  // Warning: Cannot be changed after a given workflow version has been created
+  // Default: 7
+  workflowExecutionRetentionPeriodInDays: 2,
+
+  // AWS region
+  // Default: process.env.AWS_DEFAULT_REGION || 'eu-west-1'
+  region: 'eu-west-1',
+})
+
+```
+
+#### With spinner
+
+```javascript
+SWF.DevOps.deployWithSpinner({
+  // ...
+})
+```
+
+#### Manually invoke decider
+
+If you have chosen to set `enableDeciderSchedule` to `false`, you can
+invoke a single run of the decider.
+
+```javascript
+SWF.DevOps.invokeDecider({
+  namespace: 'myapp-production',
+  version: 'v1',
+})
+```
+
+#### Teardown
+
+```javascript
+import {SWF} from 'soflow'
+
+const teardownPromise = SWF.DevOps.teardown({
+  namespace: 'myapp-production',
+  domain: 'MyDomain',
+  s3Bucket: 'mybucket',
+  s3Prefix: 'temporary-files/',
+  removeBucket: false,
+  region: 'eu-west-1',
 })
 ```
 
