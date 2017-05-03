@@ -7,6 +7,8 @@ const {
 } = process.env
 
 test('SWF: SimpleMath', async t => {
+  t.timeoutAfter(7000)
+
   const result = await SWF.executeWorkflow({
     domain,
     namespace,

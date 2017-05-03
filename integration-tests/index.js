@@ -19,7 +19,7 @@ catch (error) {
 
 // Run SWF tests
 if (!switches.includes('--no-setup')) {
-  test('⚙  SWF Deployment', async t => {
+  test('⚙  SWF Deployment', async () => {
     await SWF.DevOps.deployWithSpinner({
       namespace,
       domain,
@@ -34,10 +34,8 @@ if (!switches.includes('--no-setup')) {
       ],
       soflowRoot: '.',
       createBucket: true,
-      enableDeciderSchedule: false,
+      enableDeciderSchedule: true,
     })
-    t.comment('Giving AWS some time to get up and running...')
-    await new Promise(resolve => setTimeout(resolve, 10000))
   })
 }
 
@@ -46,6 +44,7 @@ test('⚙  Invoking SWF decider lambda function', async t => {
     namespace,
     version,
   })
+  await new Promise(resolve => setTimeout(resolve, 2000))
 
   t.pass(`Invoked decider for ${namespace}@${version}`)
 })
@@ -62,11 +61,33 @@ catch (error) {
   console.log('error', error)
 }
 
-if (!switches.includes('--no-teardown')) {
-  test('⚙  SWF teardown', async () => {
+test('⚙  Cleanup', async t => {
+  await SWF.DevOps.shutdownDeciders({
+    namespace,
+    domain,
+    version,
+  })
+
+  t.pass('Sent signals to deciders to shut down')
+
+  await SWF.DevOps.terminateWorkflows({
+    domain,
+    namespace,
+  })
+
+  t.pass('Terminated workflows')
+
+  if (!switches.includes('--no-teardown')) {
     await SWF.DevOps.teardownWithSpinner({
       namespace,
       domain,
     })
-  })
-}
+
+    if (!switches.includes('--skip-teardown-wait')) {
+      const AWS_TEARDOWN_WAIT = 60
+      console.log(`Waiting ${AWS_TEARDOWN_WAIT} seconds for AWS to complete teardown.`)
+
+      await new Promise(resolve => setTimeout(resolve, AWS_TEARDOWN_WAIT * 1000))
+    }
+  }
+})

@@ -7,6 +7,7 @@ const {
 } = process.env
 
 test('SWF: DeciderException', async t => {
+  t.timeoutAfter(7000)
   t.plan(3)
 
   await SWF.executeWorkflow({
