@@ -7,7 +7,7 @@ test('LocalWorkflow: Timers', async t => {
   const result = await LocalWorkflow.executeWorkflow({
     workflows,
     tasks,
-    name: 'Timers', // TODO: change to type?
+    type: 'Timers',
   })
 
   t.equal(result, 'correct', 'handles starting and canceling timers')
