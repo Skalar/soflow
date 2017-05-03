@@ -29,6 +29,7 @@ function sendSignal(workflowId, input) {
 }
 
 test('SWF: ReceiveSignal', async t => {
+  t.timeoutAfter(7000)
   t.plan(1)
 
   const testData = {testdata: 10}
@@ -59,6 +60,7 @@ test('SWF: ReceiveSignal', async t => {
 })
 
 test('SWF: ReceiveSignal multiple times with the same signal name', async t => {
+  t.timeoutAfter(7000)
   t.plan(1)
 
   const testData = [10, 'foo']
