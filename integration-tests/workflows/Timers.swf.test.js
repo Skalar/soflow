@@ -15,5 +15,17 @@ test('SWF: Timers', async t => {
     version: 'integration_tests',
   })
 
-  t.equal(result, 'correct', 'handles starting and canceling timers')
+  t.equal(result, 'correct', 'handles running a timer')
+})
+
+test('SWF: Timers can be cancelled', async t => {
+  const result = await SWF.executeWorkflow({
+    domain,
+    namespace,
+    id: 'CancelledTimers',
+    type: 'CancelledTimers',
+    version: 'integration_tests',
+  })
+
+  t.equal(result, 'correct', 'handles starting and cancelling a timer')
 })

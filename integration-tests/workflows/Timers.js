@@ -1,16 +1,14 @@
 async function Timers({
   actions: {
     timer,
-    cancelTimer,
   }
 }) {
-  let result = 'correct'
-  timer({id: 'timeout', seconds: 2, data: {my: 'data'}}).then(
-    () => { result = 'incorrect' }
-  )
-  await timer({id: 'waitForCancellation', seconds: 1})
+  let result = 'incorrect'
+  const {startTime} = await timer({id: 'timeout', seconds: 2, data: {startTime: Date.now()}})
 
-  cancelTimer('timeout')
+  if (Date.now() - startTime >= 2000) {
+    result = 'correct'
+  }
 
   return result
 }
