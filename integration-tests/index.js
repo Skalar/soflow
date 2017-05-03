@@ -9,6 +9,15 @@ const {
 
 const switches = process.argv.slice(2)
 
+// Run LocalWorkflow tests
+try {
+  require('./workflows/Timers.localworkflow.test')
+}
+catch (error) {
+  console.dir(error, {depth: null})
+}
+
+// Run SWF tests
 if (!switches.includes('--no-setup')) {
   test('⚙  SWF Deployment', async t => {
     await SWF.DevOps.deployWithSpinner({
@@ -46,6 +55,8 @@ try {
   require('./workflows/DeciderException.swf.test')
   require('./workflows/LambdaFailure.swf.test')
   require('./workflows/ReceiveSignal.swf.test')
+  require('./workflows/Timers.swf.test')
+  require('./workflows/ChildWorkflows.swf.test')
 }
 catch (error) {
   console.log('error', error)
