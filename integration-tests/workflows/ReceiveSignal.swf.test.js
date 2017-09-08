@@ -30,7 +30,7 @@ test('SWF: ReceiveSignal', async t => {
   const promise = SWF.executeWorkflow({
     domain,
     namespace,
-    id: workflowId,
+    workflowId,
     type: 'ReceiveSignal',
     version: 'integration_tests',
     executionStartToCloseTimeout: 5,
@@ -61,7 +61,7 @@ test('SWF: ReceiveSignal multiple times with the same signal name', async t => {
   const promise = SWF.executeWorkflow({
     domain,
     namespace,
-    id: workflowId,
+    workflowId,
     type: 'ReceiveSignalMultipleTimes',
     version: 'integration_tests',
     executionStartToCloseTimeout: 5,

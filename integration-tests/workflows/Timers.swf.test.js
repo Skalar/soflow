@@ -10,7 +10,7 @@ test('SWF: Timers', async t => {
   const result = await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'Timers',
+    workflowId: 'Timers',
     type: 'Timers',
     version: 'integration_tests',
   })
@@ -22,7 +22,7 @@ test('SWF: Timers can be cancelled', async t => {
   const result = await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'CancelledTimers',
+    workflowId: 'CancelledTimers',
     type: 'CancelledTimers',
     version: 'integration_tests',
   })
