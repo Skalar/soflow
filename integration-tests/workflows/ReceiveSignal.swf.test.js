@@ -1,8 +1,5 @@
 import test from 'blue-tape'
-import AWS from 'aws-sdk'
 import {SWF} from '~/lib'
-
-const swf = new AWS.SWF({region: 'eu-west-1'})
 
 const {
   SWF_DOMAIN: domain,
@@ -14,10 +11,10 @@ function sendSignal(workflowId, input) {
     domain,
     signalName: 'receiveSignalTest',
     workflowId,
-    input: JSON.stringify(input),
+    input,
   }
 
-  return swf.signalWorkflowExecution(params).promise()
+  return SWF.signalWorkflowExecution(params)
 }
 
 test('SWF: ReceiveSignal', async t => {

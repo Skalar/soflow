@@ -7,7 +7,7 @@ function sendSignal(workflowId, input) {
   const params = {
     signalName: 'receiveSignalTest',
     workflowId,
-    input: JSON.stringify(input),
+    input,
   }
 
   return LocalWorkflow.signalWorkflowExecution(params)
