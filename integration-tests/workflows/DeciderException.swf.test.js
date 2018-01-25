@@ -13,7 +13,7 @@ test('SWF: DeciderException', async t => {
   await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'DeciderException',
+    workflowId: 'DeciderException',
     type: 'DeciderException',
     version: 'integration_tests',
     executionStartToCloseTimeout: 5,

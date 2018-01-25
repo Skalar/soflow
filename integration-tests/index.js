@@ -12,6 +12,7 @@ const switches = process.argv.slice(2)
 // Run LocalWorkflow tests
 try {
   require('./workflows/Timers.localworkflow.test')
+  require('./workflows/ReceiveSignal.localworkflow.test')
 }
 catch (error) {
   console.dir(error, {depth: null})

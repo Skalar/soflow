@@ -12,7 +12,7 @@ test('SWF: SimpleMath', async t => {
   const result = await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'SimpleMath',
+    workflowId: 'SimpleMath',
     type: 'SimpleMath',
     version: 'integration_tests',
     executionStartToCloseTimeout: 5,

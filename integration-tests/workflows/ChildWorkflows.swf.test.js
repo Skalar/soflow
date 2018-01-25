@@ -10,7 +10,7 @@ test('SWF: ChildWorkflows', async t => {
   const result = await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'ChildWorkflows',
+    workflowId: 'ChildWorkflows',
     type: 'ChildWorkflows',
     version: 'integration_tests'
   })

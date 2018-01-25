@@ -13,7 +13,7 @@ test('SWF: LambdaFailure', async t => {
   await SWF.executeWorkflow({
     domain,
     namespace,
-    id: 'LambdaFailure',
+    workflowId: 'LambdaFailure',
     type: 'LambdaFailure',
     version: 'integration_tests',
     executionStartToCloseTimeout: 5,
