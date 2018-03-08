@@ -1,0 +1,32 @@
+#!/bin/ash
+
+set -e
+
+cd /src
+
+watchexec \
+  --watch lib \
+  --watch scripts \
+  --watch test \
+  --watch package.json \
+  --watch yarn.lock \
+  --watch main.js \
+  --watch test.js \
+  --watch .babelrc \
+  --watch .npmignore \
+  --watch README.md \
+  "\
+    clear && \
+    rsync -a --delete \
+    --include '/lib/***' \
+    --include '/scripts/***' \
+    --include '/test/***' \
+    --include '/package.json' \
+    --include '/yarn.lock' \
+    --include '/main.js' \
+    --include '/test.js' \
+    --include '/.babelrc' \
+    --include '/.npmignore' \
+    --include '/README.md' \
+    --exclude '*' \
+    . /soflow && scripts/lint"

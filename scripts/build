@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+
+nodeTargets=($NODE_TARGETS)
+babel=/soflow/node_modules/babel-cli/bin/babel.js
+
+echo -n "Transpiling"
+
+for target in "${nodeTargets[@]}"
+do
+  if [[ $target = *"native"* ]]; then
+    continue
+  fi
+
+  sanitizedTarget=$(echo $target | tr . _)
+  echo -n " lib[$target]"
+
+  BABEL_ENV=$target $babel \
+    --copy-files \
+    --quiet \
+    --out-dir /soflow/lib-$sanitizedTarget \
+    lib
+
+  # rsync to remove old files here
+
+  echo -n " test[$target]"
+  BABEL_ENV=$target $babel \
+    --copy-files \
+    --quiet \
+    --out-dir /soflow/test-$sanitizedTarget \
+    test
+
+  # rsync to remove old files here
+done
+
+echo ', done.'
+

@@ -3,13 +3,9 @@ version: '2'
 services:
   dev:
     build: .
-    working_dir: /soflow/compiled
-    tty: true
     volumes:
-      - .:/soflow/src
-      - /soflow/compiled
+      - .:/src:cached
     environment:
-      SWF_DOMAIN: SoFlow
-      SOFLOW_NAMESPACE: $USER-soflow-testing
-      SOFLOW_VERSION: integration_tests
-    command: devops/start-dev
+      SOFLOW_SWF_DOMAIN: SoFlow
+      SOFLOW_NAMESPACE: $USER-sftest
+      SOFLOW_WORKFLOWS_VERSION: test

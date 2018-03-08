@@ -1,0 +1,8 @@
+#!/bin/ash
+
+set -e
+
+yarn test --verbose
+ln -s /src/.git /soflow/.git
+yarn publish $@
+rm /soflow/.git

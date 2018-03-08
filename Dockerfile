@@ -1,41 +1,36 @@
-FROM node:7.4-slim
+FROM trym/watchexec-alpine as watchexec
+FROM node:6.13.0-alpine
+FROM node:9.6.1-alpine as production
 
-# Install yarn
-RUN mkdir -p /opt/yarn && curl -sL https://yarnpkg.com/latest.tar.gz | tar zxf - -C /opt/yarn --strip-components=1
-ENV PATH=/opt/yarn/bin:$PATH
+COPY --from=watchexec /bin/watchexec /bin
+COPY --from=node:6.13.0-alpine /usr/local /usr/local-6.13.0
 
-ENV packageName=soflow
+# Prepare node binary links/wrappers in /node
+RUN \
+  mkdir -p /node && \
+  ln -s /usr/local-6.13.0/bin/node /node/6.13.0 && \
+  ln -s /usr/local/bin/node /node/9.6.1-native
 
-ENV \
-  COMPILED_DIR=/$packageName/compiled \
-  SRC_DIR=/$packageName/src
+ENV NODE_TARGETS="6.13.0 9.6.1-native"
+
+RUN apk -U add bash git rsync
 
 # Include node_modules/.bin in PATH for not having to prefix commands
-ENV PATH=$PATH:/$packageName/node_modules/.bin
+ENV PATH=$PATH:/soflow/node_modules/.bin
 
-RUN mkdir -p \
-  # Compiled files
-  $COMPILED_DIR \
+RUN mkdir /soflow
 
-  # Source files
-  $SRC_DIR
-
-WORKDIR /$packageName
-
-COPY package.json yarn.lock ./
+WORKDIR /soflow
 
 RUN \
-  yarn install \
-  && ln -s /$packageName/node_modules $SRC_DIR/node_modules \
-  && cp -R /$packageName/node_modules $COMPILED_DIR/
+  ln -s lib lib-9_6_1-native && \
+  ln -s test test-9_6_1-native
 
-WORKDIR $COMPILED_DIR
-
+COPY package.json yarn.lock ./
+RUN yarn
 COPY . .
+RUN ln -s /soflow /soflow/node_modules/soflow
+RUN cd test && yarn install --flat --production --ignore-optional --modules-folder ../lambda-modules
 
-RUN babel \
-  --copy-files \
-  --quiet \
-  --ignore node_modules \
-  --out-dir $COMPILED_DIR \
-  .
+
+CMD scripts/start-dev

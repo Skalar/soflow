@@ -1,60 +1,48 @@
 {
   "name": "soflow",
-  "version": "0.0.1",
-  "description": "Run local and swf workflows",
-  "main": "lib/index.js",
+  "version": "0.0.1-alpha.1",
+  "description":
+    "Easily run distributed workflows with AWS Simple Workflow Service and Lambda",
+  "main": "main.js",
   "author": "Trym Skaar <trym.skaar@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.23.0",
-    "babel-core": "^6.23.1",
-    "babel-eslint": "^7.1.1",
-    "babel-plugin-transform-class-properties": "^6.23.0",
-    "babel-plugin-transform-export-extensions": "^6.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.4.0",
-    "babel-preset-es2015": "^6.22.0",
-    "babel-preset-es2017": "^6.22.0",
-    "babel-preset-latest": "^6.22.0",
-    "babel-root-import": "^4.1.8",
-    "blue-tape": "^1.0.0",
-    "eslint": "^3.17.1",
+    "ava": "^0.25.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-async-generator-functions": "^6.24.1",
+    "babel-plugin-transform-es2017-object-entries":
+      "git+https://github.com/Akiyamka/babel-plugin-transform-es2017-object-entries.git",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-util-promisify": "^0.2.2",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^3.19.0",
     "eslint-config-skalar": "^0.0.7",
-    "nodemon": "^1.11.0",
-    "proxyquire": "^1.7.11",
+    "faucet": "^0.0.1",
+    "proxyquire": "^1.8.0",
+    "tap-dot": "^1.0.5",
     "tap-spec": "^4.1.1",
-    "tape": "^4.6.3"
+    "tape": "^4.8.0",
+    "bunyan": "^1.8.12"
   },
   "dependencies": {
     "archiver": "^1.3.0",
     "async": "^2.4.0",
     "aws-sdk": "^2.23.0",
-    "axios": "^0.15.3",
-    "debug": "^2.6.1",
     "glob": "^7.1.1",
-    "lodash": "^4.17.4",
+    "lodash.get": "^4.4.2",
     "ora": "^1.2.0",
+    "promisify-node": "^0.4.0",
+    "semver": "^5.5.0",
     "serialize-error": "^2.1.0",
-    "uuid": "^3.0.1",
-    "winston": "^2.3.1"
+    "uuid": "^3.0.1"
   },
-  "babel": {
-    "plugins": [
-      "transform-object-rest-spread",
-      "transform-runtime",
-      "transform-class-properties",
-      "transform-export-extensions",
-      "babel-root-import"
-    ],
-    "presets": [
-      "env"
-    ]
+  "scripts": {
+    "test": "scripts/test",
+    "build": "scripts/build"
   },
   "eslintConfig": {
-    "extends": [
-      "skalar"
-    ],
+    "extends": ["skalar"],
     "rules": {
       "react/prop-types": 0,
       "no-magic-numbers": 0,

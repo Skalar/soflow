@@ -1,28 +1,70 @@
-# SoFlow
+# soflow
 
-An attempt at making AWS SWF usage practical.
+Easily run distributed workflows with AWS [Simple Workflow Service](https://aws.amazon.com/swf/) and [Lambda](https://aws.amazon.com/lambda/)
 
+## Table of contents
 
-## Usage
+* [Installation](#installation)
+* [Basic usage](#basic-usage)
+  * [Configuration](#configuration)
+  * [Defining tasks](#defining-tasks)
+  * [Defining workflows](#defining-workflows)
+  * [Deploying AWS resources](#deploying-aws-resources)
+  * [Running workers](#running-workers)
+  * [Executing workflow](#executing-workflow)
+  * [Terminating workflow executions](#terminating-workflow-executions)
+  * [Tearing down AWS resources](#tearing-down-aws-resources)
+  * [Executing workflow without AWS](#executing-workflow-without-aws)
+* [API docs](#api-docs)
+* [Development](#development)
+  * [Starting dev-environment](#starting-dev-environment)
+  * [Running tests](#running-tests)
 
-### Install package
+## Installation
 
+> A minimum of node 6.5.0 is required
 
-```shell
-# Temporary method for now
-yarn add https://soflow-package.s3.amazonaws.com/soflow-latest.tgz
+```bash
+yarn add soflow
 ```
 
-### Define tasks
+## Basic usage
 
-__tasks/index.js__
+### Configuration
+
+> You can provide configuration as `environment variables`, via `soflow.config` or `passed as an argument` to a soflow function.
 
 ```javascript
-export addOrderToDatabase from './addOrderToDatabase'
-export sendOrderConfirmation from './sendOrderConfirmation'
+const {SWF, config} = require('soflow')
+
+config.update({
+  namespace: 'mynamespace',
+  swfDomain: 'MyDomain'
+})
+
+// above code must be required/invoked before your code that uses soflow.
+
+SWF.executeWorkflow({namespace: 'othernamespace', ...})
 ```
 
-__tasks/addOrderToDatabase.js__
+| Variable name        | ENV variable                 | Description                                                                                                                                                       |
+| -------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace`          | `SOFLOW_NAMESPACE`           | Prefix for all AWS resources (globally unique) <br> _default_: undefined                                                                                          |
+| `version`            | `SOFLOW_WORKFLOWS_VERSION`   | Developer-specified workflows version to use <br> _default_: undefined                                                                                            |
+| `swfDomain`          | `SOFLOW_SWF_DOMAIN`          | Under which AWS SWF Domain to operate <br> _default_: 'SoFlow'                                                                                                    |
+| `codeRoot`           | `SOFLOW_CODE_ROOT`           | Path to root directory of code to be deployed <br> _default_: process.cwd()                                                                                       |
+| `tasksPath`          | `SOFLOW_TASKS_PATH`          | Requireable path to tasks, relative to codeRoot <br> _default_: 'tasks'                                                                                           |
+| `workflowsPath`      | `SOFLOW_WORKFLOWS_PATH`      | Requireable path to workflows, relative to codeRoot <br> _default_: 'workflows'                                                                                   |
+| `soflowPath`         | `SOFLOW_PATH`                | Requireable path to soflow, relative to codeRoot <br> _default_: 'node_modules/soflow'                                                                            |
+| `s3Bucket`           | `SOFLOW_S3_BUCKET`           | Name of S3 bucket to for lambda packages <br> _default_: namespace                                                                                                |
+| `s3Prefix`           | `SOFLOW_S3_PREFIX`           | Key prefix for S3 objects <br> _default_: 'soflow/'                                                                                                               |
+| `awsRegion`          | `SOFLOW_AWS_REGION`          | Which AWS region to operate in <br> _default_: 'eu-west-1'                                                                                                        |
+| `executionRetention` | `SOFLOW_EXECUTION_RETENTION` | Number of days to keep workflow executions. <br> **note**: Can only be set the first time an SWF domain is created, after which it is immutable <br> _default_: 1 |
+
+### Defining tasks
+
+> tasks.js
+
 ```javascript
 async function addOrderToDatabase(data) {
   // do your stuff
@@ -30,45 +72,24 @@ async function addOrderToDatabase(data) {
 }
 
 addOrderToDatabase.config = {
-  SWF: {
-    lambda: {
-      memorySize: 128,
-      timeout: 60,
-    }
-  }
-}
-export default addOrderToDatabase
-```
-
-__tasks/sendOrderConfirmation.js__
-```javascript
-async function sendOrderConfirmation(orderData) {
-  // do your stuff
+  type: 'both', // deploy as lambda function and register activity type
+  memorySize: 128, // only enforced by lambda
+  scheduleToStartTimeout: 10, // only applies when run as activity
+  startToCloseTimeout: 60,
+  scheduleToCloseTimeout: 20, // only applies to activities
 }
 
-export default sendOrderConfirmation
+exports.addOrderToDatabase = addOrderToDatabase
 ```
 
-### Define workflows
+### Defining workflows
 
-__workflows/index.js__
-```javascript
-export CreateOrder from './CreateOrder'
-```
+> workflows.js
 
-__workflows/CreateOrder.js__
 ```javascript
 async function CreateOrder({
-  input: {
-    confirmationEmailRecipient,
-    products,
-    customerId,
-  },
-  actions,
-  tasks: {
-    addOrderToDatabase,
-    sendOrderConfirmation,
-  }
+  input: {confirmationEmailRecipient, products, customerId},
+  tasks: {addOrderToDatabase, sendOrderConfirmation},
 }) {
   const orderData = await addOrderToDatabase(customerId, products)
   await sendOrderConfirmation(orderData)
@@ -77,172 +98,235 @@ async function CreateOrder({
 }
 
 CreateOrder.config = {
-  SWF: {
-    tasks: {
-      addOrderToDatabase: {type: 'lambda'}, // default
-      sendOrderConfirmation: {type: 'activityTask'}
-    }
-  }
+  startToCloseTimeout: 30,
+  tasks: {
+    addOrderToDatabase: {type: 'faas'},
+    sendOrderConfirmation: {type: 'activity'},
+  },
 }
 
-export default CreateOrder
+exports.CreateOrder = CreateOrder
 ```
 
-
-
-### Deployment
+### Deploying AWS resources
 
 ```javascript
-import {SWF} from 'soflow'
+const {SWF} = require('soflow')
 
-const deployPromise = SWF.DevOps.deploy({
-  // Prefix for all created resources
-  // WARNING: be sure namespace is unique, teardown removes
-  // everything it finds within it.
-  namespace: 'myapp-production',
+const deployPromise = SWF.Orchestration.setup({
+  progressIndicator: true   // default: false
 
-  // Name of SWF domain
-  // Default: namespace
-  domain: 'MyDomain',
-
-  // Description of SWF domain (if one is to be created)
-  domainDescription: 'Very nice domain',
-
-  // Version name for the deployment
-  version: 'v1',
-
-  // Root of the code to deploy.
-  // Default: process.cwd()
-  codeRoot: '/my/code/is/here',
-
-  // Whether to continously run decider via scheduled events
-  // Default: true
-  enableDeciderSchedule: true,
-
-  // Path to your exported workflows, relative to codeRoot
-  // Default: 'workflows'
-  workflowsPath: 'workflows',
-
-  // Path to your exported tasks, relative to codeRoot
-  // Default: 'tasks'
-  tasksPath: 'tasks',
-
-  // File patterns of what to include in the lambda package.
+  // File glob patterns to include in the lambda package.
   // Everything needed by your tasks must be included (including the soflow npm module).
-  // Default: ['**']
+  // Default: [`${tasksPath}/**`, `${workflowsPath}/**`]
   files: [
-    'package.json',
-    'node_modules/**',
+    [
+      'stripped_node_modules/**',
+      // Provided callback can return a new filename or true/false for whether to include the file
+      path => path.replace('stripped_node_modules', 'node_modules')
+    ],
     'workflows/**',
     'tasks/**',
+    'lib/**',
   ],
-
-  // File patterns of what to ignore when building the lambda package
-  // Default: ['.git/**']
-  ignore: [
-    '.git/**',
-  ]
-
-  // Name of s3 bucket to use as an intermediary for lambda code packages
-  // Default: namespace
-  s3Bucket: 'mybucket',
-
-  // Prefix for files in the s3 bucket
-  // Default: 'soflow/'
-  s3Prefix: 'temporary-files/',
-
-  // Whether or not to create s3 bucket
-  // Default: true
-  createBucket: false,
-
-  // Location of the soflow module, relative to the codeRoot
-  // Default: 'node_modules/soflow'
-  soflowRoot: '/shared/node_modules/soflow',
-
-  // How long to keep workflow history.
-  // Warning: Cannot be changed after a given workflow version has been created
-  // Default: 7
-  workflowExecutionRetentionPeriodInDays: 2,
-
-  // AWS region
-  // Default: process.env.AWS_DEFAULT_REGION || 'eu-west-1'
-  region: 'eu-west-1',
-})
-
-```
-
-#### With spinner
-
-```javascript
-SWF.DevOps.deployWithSpinner({
-  // ...
 })
 ```
 
-#### Manually invoke decider
+### Running workers
 
-If you have chosen to set `enableDeciderSchedule` to `false`, you can
-invoke a single run of the decider.
+#### Decider worker
+
+> This worker serves as the workflow decider/conductor.
 
 ```javascript
-SWF.DevOps.invokeDecider({
-  namespace: 'myapp-production',
-  version: 'v1',
+#!/usr/bin/env node
+
+const {SWF} = require('soflow')
+const workflows = require('./workflows')
+const tasks = require('./tasks')
+
+const deciderWorker = new SWF.DeciderWorker({
+  workflows,
+  tasks,
+  concurrency: 2,
 })
+
+deciderWorker.on('error', error => {
+  console.error(error)
+  process.exit(1)
+})
+
+deciderWorker.start()
 ```
 
-#### Teardown
+#### Activity worker
+
+> This worker executes scheduled activity tasks.
 
 ```javascript
-import {SWF} from 'soflow'
+#!/usr/bin/env node
 
-const teardownPromise = SWF.DevOps.teardown({
-  namespace: 'myapp-production',
-  domain: 'MyDomain',
-  s3Bucket: 'mybucket',
-  s3Prefix: 'temporary-files/',
-  removeBucket: false,
-  region: 'eu-west-1',
+const {SWF} = require('soflow')
+const workflows = require('./workflows')
+const tasks = require('./tasks')
+
+const activityWorker = new SWF.ActivityWorker({
+  workflows,
+  tasks,
+  concurrency: 2,
 })
+
+activityWorker.on('error', error => {
+  console.error(error)
+  process.exit(1)
+})
+
+activityWorker.start()
 ```
 
-### Execute workflow
-```javascript
-import {SWF} from 'soflow'
+#### Lambda decider
 
-async function runWorkflow() {
-  const result = await SWF.executeWorkflow({
-    domain: 'myapp',
-    namespace: 'myapp-production',
-    id: 'CreateOrder-12345',
+> Soflow supports running SWF deciders as Lamda functions.  
+> Due to the nature of Lambda and SWF, the implementation has some important details.
+
+##### Enable lambda decider
+
+> When the lambda decider is enabled, soflow enables a scheduled CloudWatch event rule that triggers the decider lambda function every minute.  
+> The lambda function will run for 65-130 seconds, exiting when there no longer time (60s + 5s slack) to do an empty poll. This is to prevent decision tasks being temporarily "stuck".
+> This means between 1 and 2 deciders are running at any given time, each able to handle multiple decision tasks concurrenctly.
+>
+> Note that it can take up to 1 minute for the first invocation to happen.
+
+```javascript
+await SWF.Orchestration.Lambda.enableDecider()
+```
+
+##### Disable lambda decider
+
+> Disables the CloudWatch event rule. It can take up to 2 minutes for all deciders to be shut down.
+
+```javascript
+await SWF.Orchestration.Lambda.disableDecider()
+```
+
+##### Manually invoke lambda decider function
+
+> May be used with enableDecider() to ensure a decider is running immediately, or to temporarily scale up the decider capacity.
+
+```javascript
+await SWF.Orchestration.Lambda.invokeDecider()
+```
+
+##### Manually shut down running lambda deciders
+
+```javascript
+await SWF.Orchestration.Lambda.shutdownDeciders()
+```
+
+### Executing workflow
+
+```javascript
+const {SWF} = require('soflow')
+
+async function startCreateOrderWorkflow() {
+  // Initiate workflow execution
+  const execution = await SWF.executeWorkflow({
     type: 'CreateOrder',
-    version: 'v1',
-    input: {productIds: [1,2,3]},
+    workflowId: 'CreateOrder-12345',
+    input: {productIds: [1, 2, 3]},
   })
+
+  // Optionally await workflow result
+  const result = await execution.promise
+}
+```
+
+### Terminating workflow executions
+
+```javascript
+const {SWF} = require('soflow')
+
+async function terminationExample() {
+  await SWF.terminateAllExecutions() // terminate ALL workflow executions within namespace
+  await SWF.terminateExecution({workflowId: 'myid'})
+}
+```
+
+### Tearing down AWS resources
+
+> Warning: this removes all AWS resources within the given namespace
+
+```javascript
+const {SWF} = require('soflow')
+
+async function teardownExample() {
+  await SWF.Orchstration.teardown({
+    removeBucket: true, // default: false
+    progressIndicator: true, // default: false
+  })
+}
+```
+
+### Executing workflow without AWS
+
+Soflow provides a limited LocalWorkflow backend, with the same API as the SWF backend.  
+This can be useful during development or testing, but be aware that it:
+
+* runs all workflow (decider) functions in the current process
+* does not enforce worklow timeouts
+* only allows workflow signaling within the same process
+* runs tasks in separate child processes, on the local node
+* only enforces task startToCloseTimeout
+* is not able to terminate workflow executions
+
+```javascript
+const {LocalWorkflow} = require('soflow')
+
+async function runWorkflowWithoutSWF() {
+  const execution = await LocalWorkflow.executeWorkflow({
+    type: 'CreateOrder'
+    workflowId: 'order-1234'
+    input: {}
+    // ...
+  })
+
+  // Optionally await workflow result
+  const result = await execution.promise
 }
 ```
 
 ## Development
 
-### Getting started
+### Starting dev environment
 
+```bash
+# Bring up a local dynamodb and s3 as well as linting every time the code changes.
 
-```shell
-# Continuously build files and run unit tests
 docker-compose up --build
+
+# Or you could use the tmux-session script:
+
+ln -s $PWD/scripts/tmux-session ~/.bin/soflow
+
+soflow         # start or resume tmux dev session
+               # brings up linting, unit and integration tests with file watching
+
+soflow clean   # stops/cleans docker containers, tmux session
 ```
 
-### Running integration tests
-```shell
-# Copy docker-compose override file and configure AWS credentials
-cp docker-compose.override.example.yml docker-compose.override.yml
+### Running tests
 
-# Run tests
-docker-compose exec dev devops/integration-tests
+> Requires the development environment to be running
 
-# Run tests without tearing down CloudFormation stack
-docker-compose exec dev devops/integration-tests --no-teardown
+```bash
+# Unit and integration tests for all node targets
+docker-compose exec dev scripts/test
 
-# Run tests without setting up and tearing down CloudFormation stack
-docker-compose exec dev devops/integration-tests --no-setup --no-teardown
+# Unit tests for node 6.13.0 with file watching and verbose output
+docker-compose exec dev ash -c \
+  "NODE_TARGETS=6.13.0 scripts/unit-tests --watch --verbose"
+
+# Integration tests with 'local' profile and untranspiled code using node 9.6.1
+docker-compose exec dev ash -c \
+  "NODE_TARGETS=9.6.1-native PROFILES=local scripts/unit-tests --verbose"
 ```
