@@ -14,6 +14,7 @@ Easily run distributed workflows with AWS [Simple Workflow Service](https://aws.
   * [Executing workflow](#executing-workflow)
   * [Terminating workflow executions](#terminating-workflow-executions)
   * [Tearing down AWS resources](#tearing-down-aws-resources)
+  * [Example implementations](#example-implementations)
   * [Executing workflow without AWS](#executing-workflow-without-aws)
 * [API docs](#api-docs)
 * [Development](#development)
@@ -266,6 +267,10 @@ async function teardownExample() {
   })
 }
 ```
+
+### Example implementations
+
+You can find implementation examples over at [Skalar/soflow-examples](https://github.com/Skalar/soflow-examples)
 
 ### Executing workflow without AWS
 
