@@ -1,2 +1,13 @@
-integration-tests/
-devops/
+test*
+scripts/
+**/*.test.js
+*native*/
+Dockerfile
+lambda-modules/
+.eslintrc
+.babelrc
+.dockerignore
+.editorconfig
+.git
+docker-compose.yml
+yarn.lock

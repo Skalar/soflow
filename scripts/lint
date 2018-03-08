@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -e
+
+echo Running eslint...
+eslint --color --max-warnings 0 --ignore-pattern /node_modules .
+echo All good.
+
+

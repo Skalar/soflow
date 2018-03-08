@@ -1,0 +1,54 @@
+#!/bin/bash
+
+currentDirectory=$(dirname $(readlink $0) || $0)
+projectRoot=$currentDirectory/../
+sessionName=soflow
+
+cd $projectRoot
+
+function createSession() {
+  if [[ $(expr $(tput lines) \* 3) -gt $(tput cols) ]]; then
+    layout=even-vertical
+  else
+    layout=tiled
+  fi
+
+  tmux start-server
+  tmux new-session -d -s $sessionName -n $sessionName
+  tmux splitw -t $sessionName:0
+  tmux splitw -t $sessionName:0
+  tmux splitw -t $sessionName:0
+  tmux select-layout -t $sessionName:0 ${layout:-even-vertical}
+  tmux send-keys -t $sessionName:0.0 "git status" C-m
+  tmux send-keys -t $sessionName:0.1 "\
+    clear; \
+    docker-compose up --build -d; \
+    tmux send-keys -t \"$sessionName:0.2\" 'docker-compose exec dev ash' Enter; \
+    tmux send-keys -t \"$sessionName:0.3\" 'docker-compose exec dev ash' Enter; \
+    sleep 0.5; \
+    tmux send-keys -t \"$sessionName:0.2\" 'NODE_TARGETS=9.6.1-native scripts/unit-tests --watch' Enter; \
+    tmux send-keys -t \"$sessionName:0.3\" 'NODE_TARGETS=9.6.1-native scripts/integration-tests --watch --verbose' Enter; \
+    docker-compose logs -f" \
+    C-m
+
+}
+
+function stopSession() {
+  tmux kill-session -t $sessionName
+}
+
+function attachToSession() {
+  tmux -CC attach -t $sessionName
+}
+
+if [ "$1" == "stop" ]; then    
+  stopSession
+  docker-compose kill
+elif [ "$1" == "clean" ]; then
+  stopSession
+  docker-compose kill
+  docker-compose down -v
+else
+  tmux has-session -t soflow 2> /dev/null 1>&2 || createSession $1
+  attachToSession
+fi
