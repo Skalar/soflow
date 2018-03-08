@@ -6,7 +6,6 @@ Easily run distributed workflows with AWS [Simple Workflow Service](https://aws.
 
 * [Installation](#installation)
 * [Basic usage](#basic-usage)
-  * [Configuration](#configuration)
   * [Defining tasks](#defining-tasks)
   * [Defining workflows](#defining-workflows)
   * [Deploying AWS resources](#deploying-aws-resources)
@@ -14,8 +13,8 @@ Easily run distributed workflows with AWS [Simple Workflow Service](https://aws.
   * [Executing workflow](#executing-workflow)
   * [Terminating workflow executions](#terminating-workflow-executions)
   * [Tearing down AWS resources](#tearing-down-aws-resources)
-  * [Example implementations](#example-implementations)
   * [Executing workflow without AWS](#executing-workflow-without-aws)
+* [Configuration](#configuration)
 * [API docs](#api-docs)
 * [Development](#development)
   * [Starting dev-environment](#starting-dev-environment)
@@ -31,36 +30,7 @@ yarn add soflow
 
 ## Basic usage
 
-### Configuration
-
-> You can provide configuration as `environment variables`, via `soflow.config` or `passed as an argument` to a soflow function.
-
-```javascript
-const {SWF, config} = require('soflow')
-
-config.update({
-  namespace: 'mynamespace',
-  swfDomain: 'MyDomain'
-})
-
-// above code must be required/invoked before your code that uses soflow.
-
-SWF.executeWorkflow({namespace: 'othernamespace', ...})
-```
-
-| Variable name        | ENV variable                 | Description                                                                                                                                                       |
-| -------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `namespace`          | `SOFLOW_NAMESPACE`           | Prefix for all AWS resources (globally unique) <br> _default_: undefined                                                                                          |
-| `version`            | `SOFLOW_WORKFLOWS_VERSION`   | Developer-specified workflows version to use <br> _default_: undefined                                                                                            |
-| `swfDomain`          | `SOFLOW_SWF_DOMAIN`          | Under which AWS SWF Domain to operate <br> _default_: 'SoFlow'                                                                                                    |
-| `codeRoot`           | `SOFLOW_CODE_ROOT`           | Path to root directory of code to be deployed <br> _default_: process.cwd()                                                                                       |
-| `tasksPath`          | `SOFLOW_TASKS_PATH`          | Requireable path to tasks, relative to codeRoot <br> _default_: 'tasks'                                                                                           |
-| `workflowsPath`      | `SOFLOW_WORKFLOWS_PATH`      | Requireable path to workflows, relative to codeRoot <br> _default_: 'workflows'                                                                                   |
-| `soflowPath`         | `SOFLOW_PATH`                | Requireable path to soflow, relative to codeRoot <br> _default_: 'node_modules/soflow'                                                                            |
-| `s3Bucket`           | `SOFLOW_S3_BUCKET`           | Name of S3 bucket to for lambda packages <br> _default_: namespace                                                                                                |
-| `s3Prefix`           | `SOFLOW_S3_PREFIX`           | Key prefix for S3 objects <br> _default_: 'soflow/'                                                                                                               |
-| `awsRegion`          | `SOFLOW_AWS_REGION`          | Which AWS region to operate in <br> _default_: 'eu-west-1'                                                                                                        |
-| `executionRetention` | `SOFLOW_EXECUTION_RETENTION` | Number of days to keep workflow executions. <br> **note**: Can only be set the first time an SWF domain is created, after which it is immutable <br> _default_: 1 |
+> You can find implementation examples over at [Skalar/soflow-examples](https://github.com/Skalar/soflow-examples)
 
 ### Defining tasks
 
@@ -268,10 +238,6 @@ async function teardownExample() {
 }
 ```
 
-### Example implementations
-
-You can find implementation examples over at [Skalar/soflow-examples](https://github.com/Skalar/soflow-examples)
-
 ### Executing workflow without AWS
 
 Soflow provides a limited LocalWorkflow backend, with the same API as the SWF backend.  
@@ -299,6 +265,37 @@ async function runWorkflowWithoutSWF() {
   const result = await execution.promise
 }
 ```
+
+## Configuration
+
+> You can provide configuration as `environment variables`, via `soflow.config` or `passed as an argument` to a soflow function.
+
+```javascript
+const {SWF, config} = require('soflow')
+
+config.update({
+  namespace: 'mynamespace',
+  swfDomain: 'MyDomain'
+})
+
+// above code must be required/invoked before your code that uses soflow.
+
+SWF.executeWorkflow({namespace: 'othernamespace', ...})
+```
+
+| Variable name        | ENV variable                 | Description                                                                                                                                                       |
+| -------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `namespace`          | `SOFLOW_NAMESPACE`           | Prefix for all AWS resources (globally unique) <br> _default_: undefined                                                                                          |
+| `version`            | `SOFLOW_WORKFLOWS_VERSION`   | Developer-specified workflows version to use <br> _default_: undefined                                                                                            |
+| `swfDomain`          | `SOFLOW_SWF_DOMAIN`          | Under which AWS SWF Domain to operate <br> _default_: 'SoFlow'                                                                                                    |
+| `codeRoot`           | `SOFLOW_CODE_ROOT`           | Path to root directory of code to be deployed <br> _default_: process.cwd()                                                                                       |
+| `tasksPath`          | `SOFLOW_TASKS_PATH`          | Requireable path to tasks, relative to codeRoot <br> _default_: 'tasks'                                                                                           |
+| `workflowsPath`      | `SOFLOW_WORKFLOWS_PATH`      | Requireable path to workflows, relative to codeRoot <br> _default_: 'workflows'                                                                                   |
+| `soflowPath`         | `SOFLOW_PATH`                | Requireable path to soflow, relative to codeRoot <br> _default_: 'node_modules/soflow'                                                                            |
+| `s3Bucket`           | `SOFLOW_S3_BUCKET`           | Name of S3 bucket to for lambda packages <br> _default_: namespace                                                                                                |
+| `s3Prefix`           | `SOFLOW_S3_PREFIX`           | Key prefix for S3 objects <br> _default_: 'soflow/'                                                                                                               |
+| `awsRegion`          | `SOFLOW_AWS_REGION`          | Which AWS region to operate in <br> _default_: 'eu-west-1'                                                                                                        |
+| `executionRetention` | `SOFLOW_EXECUTION_RETENTION` | Number of days to keep workflow executions. <br> **note**: Can only be set the first time an SWF domain is created, after which it is immutable <br> _default_: 1 |
 
 ## Development
 
