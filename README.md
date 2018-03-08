@@ -43,6 +43,7 @@ async function addOrderToDatabase(data) {
 }
 
 addOrderToDatabase.config = {
+  concurrency: 100, // ReservedConcurrentExecutions in lambda context
   type: 'both', // deploy as lambda function and register activity type
   memorySize: 128, // only enforced by lambda
   scheduleToStartTimeout: 10, // only applies when run as activity
