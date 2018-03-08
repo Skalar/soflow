@@ -1,8 +1,7 @@
 {
   "name": "soflow",
-  "version": "0.0.1-alpha.1",
-  "description":
-    "Easily run distributed workflows with AWS Simple Workflow Service and Lambda",
+  "version": "0.0.1",
+  "description": "Easily run distributed workflows with AWS Simple Workflow Service and Lambda",
   "main": "main.js",
   "author": "Trym Skaar <trym.skaar@gmail.com>",
   "license": "MIT",
@@ -11,19 +10,18 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-plugin-transform-async-generator-functions": "^6.24.1",
-    "babel-plugin-transform-es2017-object-entries":
-      "git+https://github.com/Akiyamka/babel-plugin-transform-es2017-object-entries.git",
+    "babel-plugin-transform-es2017-object-entries": "git+https://github.com/Akiyamka/babel-plugin-transform-es2017-object-entries.git",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-util-promisify": "^0.2.2",
     "babel-preset-env": "^1.6.1",
+    "bunyan": "^1.8.12",
     "eslint": "^3.19.0",
     "eslint-config-skalar": "^0.0.7",
     "faucet": "^0.0.1",
     "proxyquire": "^1.8.0",
     "tap-dot": "^1.0.5",
     "tap-spec": "^4.1.1",
-    "tape": "^4.8.0",
-    "bunyan": "^1.8.12"
+    "tape": "^4.8.0"
   },
   "dependencies": {
     "archiver": "^1.3.0",
@@ -42,7 +40,9 @@
     "build": "scripts/build"
   },
   "eslintConfig": {
-    "extends": ["skalar"],
+    "extends": [
+      "skalar"
+    ],
     "rules": {
       "react/prop-types": 0,
       "no-magic-numbers": 0,
