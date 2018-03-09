@@ -70,6 +70,7 @@ async function testProfiles(description, ...rest) {
         await fn(t, {
           taskList,
           backend: SoFlow.SWF,
+          profileName: 'swf',
           async executeWorkflow({workflowId, ...params}) {
             return await SoFlow.SWF.executeWorkflow({
               startToCloseTimeout: timeout / 1000,
@@ -119,6 +120,7 @@ async function testProfiles(description, ...rest) {
         await fn(t, {
           taskList,
           backend: SoFlow.SWF,
+          profileName: 'swf-lambda',
           async executeWorkflow({workflowId, ...params}) {
             return await SoFlow.SWF.executeWorkflow({
               startToCloseTimeout: timeout / 1000,
@@ -148,7 +150,7 @@ async function testProfiles(description, ...rest) {
       await fn(t, {
         taskList,
         backend: SoFlow.LocalWorkflow,
-
+        profileName: 'local',
         async executeWorkflow({workflowId, ...params}) {
           return await SoFlow.LocalWorkflow.executeWorkflow({
             workflowsPath,

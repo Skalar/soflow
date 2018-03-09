@@ -1,9 +1,10 @@
 const testProfiles = require('./helpers/testProfiles')
 
-testProfiles('Child workflows', async (t, {executeWorkflow}) => {
+testProfiles('Child workflows', async (t, {executeWorkflow, profileName}) => {
   const execution = await executeWorkflow({
     workflowId: 'child-workflows',
     type: 'ChildWorkflows',
+    input: {profileName},
   })
 
   const {firstWorkflowResult, secondWorkflowError} = await execution.promise

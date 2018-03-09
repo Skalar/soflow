@@ -1,7 +1,10 @@
-async function ChildWorkflows({actions: {childWorkflow}}) {
+async function ChildWorkflows({
+  input: {profileName},
+  actions: {childWorkflow},
+}) {
   const firstWorkflowResult = await childWorkflow({
     type: 'Dummy',
-    id: 'child-workflow-1',
+    id: `child-workflow-${profileName}-1`,
     input: {taskOptions: {args: [{result: 'some result'}]}},
     startToCloseTimeout: 3,
   })
@@ -9,7 +12,7 @@ async function ChildWorkflows({actions: {childWorkflow}}) {
   try {
     await childWorkflow({
       type: 'Dummy',
-      id: 'child-workflow-2',
+      id: `child-workflow-${profileName}-2`,
       input: {taskOptions: {args: [{error: {message: 'some error'}}]}},
       startToCloseTimeout: 3,
     })
