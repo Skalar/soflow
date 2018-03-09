@@ -1,6 +1,6 @@
 {
   "name": "soflow",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Easily run distributed workflows with AWS Simple Workflow Service and Lambda",
   "main": "main.js",
   "author": "Trym Skaar <trym.skaar@gmail.com>",
