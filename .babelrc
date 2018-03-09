@@ -17,23 +17,6 @@
           }
         ]
       ]
-    },
-    "9.6.1": {
-      "plugins": [
-        "transform-async-generator-functions",
-        "transform-object-rest-spread",
-        "transform-async-to-generator"
-      ],
-      "presets": [
-        [
-          "env",
-          {
-            "targets": {
-              "node": "9.6.1"
-            }
-          }
-        ]
-      ]
     }
   }
 }
