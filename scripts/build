@@ -22,7 +22,7 @@ do
     --out-dir /soflow/lib-$sanitizedTarget \
     lib
 
-  # rsync to remove old files here
+  rsync -r --delete --existing --ignore-existing lib/ /soflow/lib-$sanitizedTarget/
 
   echo -n " test[$target]"
   BABEL_ENV=$target $babel \
@@ -31,7 +31,7 @@ do
     --out-dir /soflow/test-$sanitizedTarget \
     test
 
-  # rsync to remove old files here
+  rsync -r --delete --existing --ignore-existing test/ /soflow/test-$sanitizedTarget/
 done
 
 echo ', done.'
