@@ -87,7 +87,10 @@ const {SWF} = require('soflow')
 
 const deployPromise = SWF.Orchestration.setup({
   progressIndicator: true   // default: false
-
+  deciderEnvironment: {
+    // environment variables available in lambda decider worklow functions
+    MY_CUSTOM_ENVIRONMENT_VARIABLE: 'myvalue', 
+  }
   // File glob patterns to include in the lambda package.
   // Everything needed by your tasks must be included (including the soflow npm module).
   // Default: [`${tasksPath}/**`, `${workflowsPath}/**`]
