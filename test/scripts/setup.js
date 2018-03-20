@@ -29,6 +29,10 @@ async function setup() {
       createBucket: true,
       enableDeciderSchedule: false,
       progressIndicator: true,
+      deciderEnvironment: {
+        MY_FIRST_VARIABLE: 'test',
+        MY_SECOND_VARIABLE: 'ing'
+      }
     })
   }
 }
