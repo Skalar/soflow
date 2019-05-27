@@ -23,10 +23,10 @@ if [[ $watchRequested ]]; then
   exit 0
 fi
 
-if [[ $NODE_TARGETS = *"6.13.0"* ]]; then
+if [[ $NODE_TARGETS = *"8.10.0"* ]]; then
   scripts/build
 else
-  NODE_TARGETS="$NODE_TARGETS 6.13.0" scripts/build
+  NODE_TARGETS="$NODE_TARGETS 8.10.0" scripts/build
 fi
 
 
@@ -40,7 +40,7 @@ do
   sanitizedNodeVersion=$(echo $nodeVersion | tr . _)
   export NODE_TARGET=$sanitizedNodeVersion
   export SOFLOW_NAMESPACE=${SOFLOW_NAMESPACE}-$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 9 | head -n 1)
-  
+
   echo -e "\n# Integration tests (node $nodeVersion)"
   echo -e "# namespace: $SOFLOW_NAMESPACE"
 
@@ -49,11 +49,11 @@ do
   $node $ava "**/*.test.js" -c 8 -T 10s $passThroughArgs
   failed=$?
   cd ..
-  
+
   # Cleanup
   export SOFLOW_NAMESPACE=$SOFLOW_ROOT_NAMESPACE
   $node test-$sanitizedNodeVersion/scripts/teardown.js
-  $node test-$sanitizedNodeVersion/scripts/clean-up-s3-buckets.js $SOFLOW_ROOT_NAMESPACE 
+  $node test-$sanitizedNodeVersion/scripts/clean-up-s3-buckets.js $SOFLOW_ROOT_NAMESPACE
 
   [[ $failed -eq 1 ]] && exit 1
 done

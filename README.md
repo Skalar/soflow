@@ -22,7 +22,7 @@ Easily run distributed workflows with AWS [Simple Workflow Service](https://aws.
 
 ## Installation
 
-> A minimum of node 6.5.0 is required
+> A minimum of node 8.10.0 is required
 
 ```bash
 yarn add soflow
@@ -89,7 +89,7 @@ const deployPromise = SWF.Orchestration.setup({
   progressIndicator: true   // default: false
   deciderEnvironment: {
     // environment variables available in lambda decider worklow functions
-    MY_CUSTOM_ENVIRONMENT_VARIABLE: 'myvalue', 
+    MY_CUSTOM_ENVIRONMENT_VARIABLE: 'myvalue',
   }
   // File glob patterns to include in the lambda package.
   // Everything needed by your tasks must be included (including the soflow npm module).
@@ -161,12 +161,12 @@ activityWorker.start()
 
 #### Lambda decider
 
-> Soflow supports running SWF deciders as Lamda functions.  
+> Soflow supports running SWF deciders as Lamda functions.
 > Due to the nature of Lambda and SWF, the implementation has some important details.
 
 ##### Enable lambda decider
 
-> When the lambda decider is enabled, soflow enables a scheduled CloudWatch event rule that triggers the decider lambda function every minute.  
+> When the lambda decider is enabled, soflow enables a scheduled CloudWatch event rule that triggers the decider lambda function every minute.
 > The lambda function will run for 65-130 seconds, exiting when there no longer time (60s + 5s slack) to do an empty poll. This is to prevent decision tasks being temporarily "stuck".
 > This means between 1 and 2 deciders are running at any given time, each able to handle multiple decision tasks concurrenctly.
 >
@@ -244,7 +244,7 @@ async function teardownExample() {
 
 ### Executing workflow without AWS
 
-Soflow provides a limited LocalWorkflow backend, with the same API as the SWF backend.  
+Soflow provides a limited LocalWorkflow backend, with the same API as the SWF backend.
 This can be useful during development or testing, but be aware that it:
 
 * runs all workflow (decider) functions in the current process
@@ -328,9 +328,9 @@ soflow clean   # stops/cleans docker containers, tmux session
 # Unit and integration tests for all node targets
 docker-compose exec dev scripts/test
 
-# Unit tests for node 6.13.0 with file watching and verbose output
+# Unit tests for node 8.10.0 with file watching and verbose output
 docker-compose exec dev ash -c \
-  "NODE_TARGETS=6.13.0 scripts/unit-tests --watch --verbose"
+  "NODE_TARGETS=8.10.0 scripts/unit-tests --watch --verbose"
 
 # Integration tests with 'local' profile and untranspiled code using node 9.6.1
 docker-compose exec dev ash -c \

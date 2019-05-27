@@ -1,17 +1,17 @@
 FROM trym/watchexec-alpine as watchexec
-FROM node:6.13.0-alpine
+FROM node:8.10.0-alpine
 FROM node:9.6.1-alpine as production
 
 COPY --from=watchexec /bin/watchexec /bin
-COPY --from=node:6.13.0-alpine /usr/local /usr/local-6.13.0
+COPY --from=node:8.10.0-alpine /usr/local /usr/local-8.10.0
 
 # Prepare node binary links/wrappers in /node
 RUN \
   mkdir -p /node && \
-  ln -s /usr/local-6.13.0/bin/node /node/6.13.0 && \
+  ln -s /usr/local-8.10.0/bin/node /node/8.10.0 && \
   ln -s /usr/local/bin/node /node/9.6.1-native
 
-ENV NODE_TARGETS="6.13.0 9.6.1-native"
+ENV NODE_TARGETS="8.10.0 9.6.1-native"
 
 RUN apk -U add bash git rsync
 

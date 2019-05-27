@@ -4,17 +4,17 @@ async function setup() {
   if (!process.env.PROFILES || process.env.PROFILES.includes('swf')) {
     return SWF.Orchestration.setup({
       codeRoot: '/soflow',
-      workflowsPath: 'test-6_13_0/workflows',
-      tasksPath: 'test-6_13_0/tasks',
+      workflowsPath: 'test-8_10_0/workflows',
+      tasksPath: 'test-8_10_0/tasks',
       includeBaseFiles: false,
       files: [
         [
           'lambda-modules/**',
           path => path.replace('lambda-modules', 'node_modules'),
         ],
-        ['lib-6_13_0/**', path => !path.endsWith('.test.js')],
-        'test-6_13_0/workflows/**',
-        'test-6_13_0/tasks/**',
+        ['lib-8_10_0/**', path => !path.endsWith('.test.js')],
+        'test-8_10_0/workflows/**',
+        'test-8_10_0/tasks/**',
         '+(package.json|main.js)',
       ],
       ignore: [
