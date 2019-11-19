@@ -32,7 +32,7 @@
     "ora": "^1.2.0",
     "promisify-node": "^0.4.0",
     "semver": "^5.5.0",
-    "serialize-error": "^2.1.0",
+    "serialize-error": "^5.0.0",
     "uuid": "^3.0.1"
   },
   "scripts": {
