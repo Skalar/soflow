@@ -15,12 +15,8 @@ function generateTaskListName(name) {
 async function testProfiles(description, ...rest) {
   const fn = rest[rest.length - 1]
   const codeRoot = '/soflow'
-  const workflowsPath = `${['test', process.env.NODE_TARGET]
-    .filter(v => v)
-    .join('-')}/workflows`
-  const tasksPath = `${['test', process.env.NODE_TARGET]
-    .filter(v => v)
-    .join('-')}/tasks`
+  const workflowsPath = 'test/workflows'
+  const tasksPath = 'test/tasks'
 
   const profiles = process.env.PROFILES
     ? process.env.PROFILES.split(/\s+/)

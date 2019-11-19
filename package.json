@@ -7,13 +7,6 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.25.0",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-plugin-transform-async-generator-functions": "^6.24.1",
-    "babel-plugin-transform-es2017-object-entries": "git+https://github.com/Akiyamka/babel-plugin-transform-es2017-object-entries.git",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-util-promisify": "^0.2.2",
-    "babel-preset-env": "^1.6.1",
     "bunyan": "^1.8.12",
     "eslint": "^3.19.0",
     "eslint-config-skalar": "^0.0.7",
@@ -36,8 +29,7 @@
     "uuid": "^3.0.1"
   },
   "scripts": {
-    "test": "scripts/test",
-    "build": "scripts/build"
+    "test": "scripts/test"
   },
   "eslintConfig": {
     "extends": [

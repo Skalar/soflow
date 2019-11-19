@@ -12,7 +12,6 @@ watchexec \
   --watch yarn.lock \
   --watch main.js \
   --watch test.js \
-  --watch .babelrc \
   --watch .npmignore \
   --watch README.md \
   "\
@@ -25,7 +24,6 @@ watchexec \
     --include '/yarn.lock' \
     --include '/main.js' \
     --include '/test.js' \
-    --include '/.babelrc' \
     --include '/.npmignore' \
     --include '/README.md' \
     --exclude '*' \

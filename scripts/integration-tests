@@ -23,39 +23,24 @@ if [[ $watchRequested ]]; then
   exit 0
 fi
 
-if [[ $NODE_TARGETS = *"6.13.0"* ]]; then
-  scripts/build
-else
-  NODE_TARGETS="$NODE_TARGETS 6.13.0" scripts/build
-fi
 
+SOFLOW_ROOT_NAMESPACE=$SOFLOW_NAMESPACE
+export SOFLOW_NAMESPACE=${SOFLOW_NAMESPACE}-$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 9 | head -n 1)
 
-nodeTargets=($NODE_TARGETS)
-ava=/soflow/node_modules/.bin/ava
+echo -e "\n# Integration tests"
+echo -e "# namespace: $SOFLOW_NAMESPACE"
 
-for nodeVersion in "${nodeTargets[@]}"
-do
-  SOFLOW_ROOT_NAMESPACE=$SOFLOW_NAMESPACE
-  node=/node/$nodeVersion
-  sanitizedNodeVersion=$(echo $nodeVersion | tr . _)
-  export NODE_TARGET=$sanitizedNodeVersion
-  export SOFLOW_NAMESPACE=${SOFLOW_NAMESPACE}-$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 9 | head -n 1)
-  
-  echo -e "\n# Integration tests (node $nodeVersion)"
-  echo -e "# namespace: $SOFLOW_NAMESPACE"
+node test/scripts/setup.js
+cd test # work around ava watching issue
+ava "**/*.test.js" -c 8 -T 10s $passThroughArgs
+failed=$?
+cd ..
 
-  $node test-$sanitizedNodeVersion/scripts/setup.js
-  cd test-$sanitizedNodeVersion # work around ava watching issue
-  $node $ava "**/*.test.js" -c 8 -T 10s $passThroughArgs
-  failed=$?
-  cd ..
-  
-  # Cleanup
-  export SOFLOW_NAMESPACE=$SOFLOW_ROOT_NAMESPACE
-  $node test-$sanitizedNodeVersion/scripts/teardown.js
-  $node test-$sanitizedNodeVersion/scripts/clean-up-s3-buckets.js $SOFLOW_ROOT_NAMESPACE 
+# Cleanup
+export SOFLOW_NAMESPACE=$SOFLOW_ROOT_NAMESPACE
+node test/scripts/teardown.js
+node test/scripts/clean-up-s3-buckets.js $SOFLOW_ROOT_NAMESPACE
 
-  [[ $failed -eq 1 ]] && exit 1
-done
+[[ $failed -eq 1 ]] && exit 1
 
 exit 0

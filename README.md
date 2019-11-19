@@ -22,7 +22,7 @@ Easily run distributed workflows with AWS [Simple Workflow Service](https://aws.
 
 ## Installation
 
-> A minimum of node 6.5.0 is required
+> A minimum of node 10 is required
 
 ```bash
 yarn add soflow
@@ -328,11 +328,11 @@ soflow clean   # stops/cleans docker containers, tmux session
 # Unit and integration tests for all node targets
 docker-compose exec dev scripts/test
 
-# Unit tests for node 6.13.0 with file watching and verbose output
+# Unit tests with file watching and verbose output
 docker-compose exec dev ash -c \
-  "NODE_TARGETS=6.13.0 scripts/unit-tests --watch --verbose"
+  "scripts/unit-tests --watch --verbose"
 
-# Integration tests with 'local' profile and untranspiled code using node 9.6.1
+# Integration tests with 'local' profile
 docker-compose exec dev ash -c \
-  "NODE_TARGETS=9.6.1-native PROFILES=local scripts/unit-tests --verbose"
+  "PROFILES=local scripts/integration-tests --verbose"
 ```

@@ -1,7 +1,11 @@
-import test from 'ava'
 import soflow from 'soflow'
+const testProfiles = require('./helpers/testProfiles')
 
-test('custom lambda decider environment variables', async t => {
+testProfiles('custom lambda decider environment variables', async (t, {profileName}) => {
+  if (profileName === 'local') {
+    t.truthy(true, 'Skipping test for local profile')
+    return
+  }
   const lambda = new soflow.config.AWS.Lambda()
   const {Configuration: {Environment: {Variables}}} = await lambda
     .getFunction({
