@@ -2,27 +2,8 @@
 
 set -e
 
-scripts/build
-
-nodeTargets=($NODE_TARGETS)
-ava=/soflow/node_modules/.bin/ava
-
-for nodeVersion in "${nodeTargets[@]}"
-do
-  node=/node/$nodeVersion
-  sanitizedNodeVersion=$(echo $nodeVersion | tr . _)
-  echo -e "\n# Unit tests (node $nodeVersion)"
-
-  
-  if [[ $target = *"native"* ]]; then
-    libName="lib"
-  else
-    libName="lib-${sanitizedNodeVersion}"
-  fi
-  
-  cd $libName
-  $node $ava $@ "**/*.test.js"
+cd lib
+ava $@ "**/*.test.js"
   cd ..
-done
 
 exit 0

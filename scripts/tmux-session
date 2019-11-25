@@ -26,8 +26,8 @@ function createSession() {
     tmux send-keys -t \"$sessionName:0.2\" 'docker-compose exec dev ash' Enter; \
     tmux send-keys -t \"$sessionName:0.3\" 'docker-compose exec dev ash' Enter; \
     sleep 0.5; \
-    tmux send-keys -t \"$sessionName:0.2\" 'NODE_TARGETS=9.6.1-native scripts/unit-tests --watch' Enter; \
-    tmux send-keys -t \"$sessionName:0.3\" 'NODE_TARGETS=9.6.1-native scripts/integration-tests --watch --verbose' Enter; \
+    tmux send-keys -t \"$sessionName:0.2\" 'scripts/unit-tests --watch' Enter; \
+    tmux send-keys -t \"$sessionName:0.3\" 'scripts/integration-tests --watch --verbose' Enter; \
     docker-compose logs -f" \
     C-m
 
